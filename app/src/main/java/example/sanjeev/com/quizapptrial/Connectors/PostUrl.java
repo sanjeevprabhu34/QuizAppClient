@@ -1,4 +1,4 @@
-package example.sanjeev.com.quizapptrial;
+package example.sanjeev.com.quizapptrial.Connectors;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
