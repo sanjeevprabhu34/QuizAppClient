@@ -4,13 +4,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -23,19 +23,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import example.sanjeev.com.quizapptrial.R;
 
-public class AddMessageFragment extends Fragment {
+public class JsonTFragment extends Fragment {
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_add_message, container, false);
+        View v = inflater.inflate(R.layout.fragment_add_section, container, false);
         return v;
     }
 
@@ -52,22 +50,38 @@ public class AddMessageFragment extends Fragment {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendPost(messageEt.getText().toString());
+                JSONArray jsonArray = new JSONArray();
+                JSONObject obj = new JSONObject();
+                try {
+                    obj.put("q", "sss");
+                    jsonArray.put(obj);
+                    obj.put("a1", "10");
+                    jsonArray.put(obj);
+                    obj.put("a2", "20");
+                    jsonArray.put(obj);
+                    obj.put("a3", "30");
+                    jsonArray.put(obj);
+
+
+                    JSONObject question = new JSONObject();
+                    question.put("question", jsonArray);
+                    addQuestion(question.toString());
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
             }
         });
 
-        getPostSections();
     }
 
-    private void setSectionSpinner(final JSONArray sectionJsonList){
-        AppCompatSpinner spinner = getActivity().findViewById(R.id.sections_spinner);
-
-    }
-
-    private void getPostSections(){
+    private void addQuestion( final String question){
         RequestQueue mRequestQueue = Volley.newRequestQueue(getActivity());
 
-        String url = "http://10.0.2.2:4466/sanjeev/work/clients/Shankar_Iyer/QuizzApp/GetPostSections.php";
+        String url = "http://10.0.2.2:4466/sanjeev/work/clients/Shankar_Iyer/QuizzApp/AddQuestionToSurvey.php";
 
         //String Request initialized
 
@@ -80,20 +94,17 @@ public class AddMessageFragment extends Fragment {
 
                 Log.e("message", response.toString());
 
-                try {
+                /*try {
                     JSONObject jsonObject = new JSONObject(response);
-                    //Log.e("response", jsonArray.getString("status"));
-                    String status = jsonObject.getString("status");
+                    String statusStr = jsonObject.getString("status");
 
-                    if(status.equalsIgnoreCase("success")){
-                        JSONArray sectionJsonArray = jsonObject.getJSONArray("content");
-                        Log.e("sections" , ""+ sectionJsonArray);
-                        setSectionSpinner(sectionJsonArray);
+                    if(statusStr.equals("success")){
+                        Toast.makeText(getActivity(), "Post created successfully", Toast.LENGTH_LONG).show();
                     }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
+                }*/
 
             }
         }, new Response.ErrorListener() {
@@ -102,15 +113,28 @@ public class AddMessageFragment extends Fragment {
 
                 Log.e("An","Error :" + error.toString());
             }
-        });
+        }){
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("question", question);
+
+
+
+                return params;
+            }
+        };
 
         mRequestQueue.add(mStringRequest);
     }
 
-    private void sendPost(final String message){
+
+
+    private void addSection( final String section_name){
         RequestQueue mRequestQueue = Volley.newRequestQueue(getActivity());
 
-        String url = "http://10.0.2.2:4466/sanjeev/work/clients/Shankar_Iyer/QuizzApp/AddNewpost.php";
+        String url = "http://10.0.2.2:4466/sanjeev/work/clients/Shankar_Iyer/QuizzApp/CreateNewPostSection.php";
 
         //String Request initialized
 
@@ -121,26 +145,16 @@ public class AddMessageFragment extends Fragment {
 
                 // Toast.makeText(getApplicationContext(),"Response :" + response.toString(), Toast.LENGTH_LONG).show();
 
-                Log.e("message", response.toString());
+                    Log.e("message", response.toString());
 
                 try {
                     JSONObject jsonObject = new JSONObject(response);
-                    //Log.e("response", jsonArray.getString("status"));
-                    String name = jsonObject.getString("status");
-                    long time = Long.parseLong(jsonObject.getString("time"));
-                    long unixSeconds = time;
-// convert seconds to milliseconds
-                    Date date = new java.util.Date(unixSeconds*1000L);
-// the format of your date
-                    SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-// give a timezone reference for formatting (see comment at the bottom)
-                    sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT-5"));
-                    String formattedDate = sdf.format(date);
-                    System.out.println(formattedDate);
+                    String statusStr = jsonObject.getString("status");
 
-                    // Toast.makeText(getApplicationContext(),"Response :" + name + " "+ formattedDate, Toast.LENGTH_LONG).show();
+                    if(statusStr.equals("success")){
+                        Toast.makeText(getActivity(), "Post created successfully", Toast.LENGTH_LONG).show();
+                    }
 
-                    Log.e("date", name + " " +formattedDate);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -157,8 +171,8 @@ public class AddMessageFragment extends Fragment {
             protected Map<String, String> getParams()
             {
                 Map<String, String>  params = new HashMap<String, String>();
-                params.put("userid", "27");
-                params.put("message", message);
+                params.put("post_name", section_name);
+
 
 
                 return params;

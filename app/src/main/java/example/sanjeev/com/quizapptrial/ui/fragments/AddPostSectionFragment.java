@@ -4,11 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +23,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,15 +45,88 @@ public class AddPostSectionFragment extends Fragment {
 
     private void init(){
         final EditText messageEt = getActivity().findViewById(R.id.message_et);
-        Button submitButton  = getActivity().findViewById(R.id.submitButton);
+        Button submitButton  = getActivity().findViewById(R.id.add_question);
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addSection(messageEt.getText().toString());
+                JSONArray jsonArray = new JSONArray();
+                JSONObject obj = new JSONObject();
+                try {
+                    obj.put("q", "sss");
+                    jsonArray.put(obj);
+                    obj.put("a1", "10");
+                    jsonArray.put(obj);
+                    obj.put("a2", "20");
+                    jsonArray.put(obj);
+                    obj.put("a3", "30");
+                    jsonArray.put(obj);
+
+
+                    JSONObject question = new JSONObject();
+                    question.put("question", jsonArray);
+                    addQuestion(question.toString());
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
             }
         });
 
+    }
+
+    private void addQuestion( final String question){
+        RequestQueue mRequestQueue = Volley.newRequestQueue(getActivity());
+
+        String url = "http://10.0.2.2:4466/sanjeev/work/clients/Shankar_Iyer/QuizzApp/AddQuestionToSurvey.php";
+
+        //String Request initialized
+
+
+        StringRequest mStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                // Toast.makeText(getApplicationContext(),"Response :" + response.toString(), Toast.LENGTH_LONG).show();
+
+                Log.e("message", response.toString());
+
+                /*try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    String statusStr = jsonObject.getString("status");
+
+                    if(statusStr.equals("success")){
+                        Toast.makeText(getActivity(), "Post created successfully", Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }*/
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Log.e("An","Error :" + error.toString());
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("question", question);
+
+
+
+                return params;
+            }
+        };
+
+        mRequestQueue.add(mStringRequest);
     }
 
 

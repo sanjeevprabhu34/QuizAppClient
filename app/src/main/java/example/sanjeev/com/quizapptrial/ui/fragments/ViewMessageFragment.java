@@ -51,7 +51,7 @@ public class ViewMessageFragment extends Fragment {
 
     private void init(){
         final EditText messageEt = getActivity().findViewById(R.id.message_et);
-        Button submitButton  = getActivity().findViewById(R.id.submitButton);
+        Button submitButton  = getActivity().findViewById(R.id.add_question);
 
         getPost();
     }

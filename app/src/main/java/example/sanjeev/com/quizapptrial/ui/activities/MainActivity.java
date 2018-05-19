@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity
             transaction.replace(R.id.fragment_place_holder, addFragment).addToBackStack(null).commit();
         } else if (id == R.id.login) {
 
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
