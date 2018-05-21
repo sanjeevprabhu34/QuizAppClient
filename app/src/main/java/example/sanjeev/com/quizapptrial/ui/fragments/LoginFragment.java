@@ -8,6 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -24,7 +27,7 @@ import example.sanjeev.com.quizapptrial.R;
 public class LoginFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_register, container, false);
+        View v = inflater.inflate(R.layout.fragment_login, container, false);
         return v;
     }
 
@@ -35,14 +38,36 @@ public class LoginFragment extends Fragment {
     }
 
     private void init() {
-        login();
+        final TextView emailTv = getActivity().findViewById(R.id.email_et);
+        final TextView passwordEt = getActivity().findViewById(R.id.password_et);
+        Button submitBtn = getActivity().findViewById(R.id.submitBtn);
+
+        submitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String email = emailTv.getText().toString();
+                String pass = passwordEt.getText().toString();
+
+                Map<String, String> params = new HashMap<>();
+                params.put("email", email);
+                params.put("password", pass);
+
+                if(!email.equals("") &&!pass.equals("") ){
+                    login(params);
+                }else{
+                    Toast.makeText(getActivity(), "e-Mail or password not filled", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+
     }
 
-    private void login( ){
+    private void login(final Map params ){
         RequestQueue mRequestQueue = Volley.newRequestQueue(getActivity());
 
         //http://localhost:4466/sanjeev/work/clients/Shankar_Iyer/QuizzApp/Login.php?email=ss@gg.com&password=1234567
-        String url = "http://localhost:4466/sanjeev/work/clients/Shankar_Iyer/QuizzApp/Login.php";
+        String url = "http://10.0.2.2:4466/sanjeev/work/clients/Shankar_Iyer/QuizzApp/Login.php";
 
         //String Request initialized
 
@@ -78,13 +103,6 @@ public class LoginFragment extends Fragment {
             @Override
             protected Map<String, String> getParams()
             {
-                Map<String, String>  params = new HashMap<String, String>();
-
-                params.put("email", "ss@gg.com");
-                params.put("password", "1234567");
-
-
-
                 return params;
             }
         };

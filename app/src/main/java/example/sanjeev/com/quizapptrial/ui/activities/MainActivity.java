@@ -122,7 +122,10 @@ public class MainActivity extends AppCompatActivity
             transaction.replace(R.id.fragment_place_holder, addFragment).addToBackStack(null).commit();
         } else if (id == R.id.login) {
 
-
+            LoginFragment addFragment = new LoginFragment();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.fragment_place_holder, addFragment).addToBackStack(null).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
