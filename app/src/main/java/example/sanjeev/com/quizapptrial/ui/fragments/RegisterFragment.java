@@ -47,15 +47,22 @@ public class RegisterFragment extends Fragment implements PostUrl.Interactor{
        final  EditText userNameTv = view.findViewById(R.id.username_et);
         final EditText nameTv = view.findViewById(R.id.name_et);
         final EditText passEt = view.findViewById(R.id.password_et);
-        final EditText emailEt = view.findViewById(R.id.email_et);
+        final EditText emailEt = view.findViewById(R.id.email_et2);
         final Button submitBtn = view.findViewById(R.id.submitBtn);
-        final String url = "http://localhost:4466/sanjeev/work/clients/Shankar_Iyer/QuizzApp/GetJsonData.php";
+        final EditText telEt = view.findViewById(R.id.tel_et);
+        final String url = "http://10.0.2.2:4466/sanjeev/work/clients/Shankar_Iyer/QuizzApp/Register.php";
         map = new HashMap<>();
 
 
         submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                map.put("username", userNameTv.getText().toString().trim());
+                map.put("name", nameTv.getText().toString().trim());
+                map.put("password", passEt.getText().toString().trim());
+                map.put("email", emailEt.getText().toString().trim());
+                map.put("tel", telEt.getText().toString().trim());
+
 
                 PostUrl(getActivity(), url, map);
             }
@@ -97,7 +104,13 @@ public class RegisterFragment extends Fragment implements PostUrl.Interactor{
                         //displaying the error in toast if occurrs
                        // Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                });
+                }){
+            @Override
+            protected Map<String, String> getParams()
+            {
+                return params;
+            }
+        };
 
         //creating a request queue
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
