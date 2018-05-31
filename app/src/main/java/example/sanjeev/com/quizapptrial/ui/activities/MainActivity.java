@@ -21,6 +21,7 @@ import example.sanjeev.com.quizapptrial.ui.fragments.AddPostSectionFragment;
 import example.sanjeev.com.quizapptrial.ui.fragments.LoginFragment;
 import example.sanjeev.com.quizapptrial.ui.fragments.RegisterFragment;
 import example.sanjeev.com.quizapptrial.ui.fragments.ViewMessageFragment;
+import example.sanjeev.com.quizapptrial.ui.fragments.ViewQuestionsFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.add_post) {
-            AddMessageFragment addFragment = new AddMessageFragment();
+            ViewQuestionsFragment addFragment = new ViewQuestionsFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.fragment_place_holder, addFragment).addToBackStack(null).commit();
