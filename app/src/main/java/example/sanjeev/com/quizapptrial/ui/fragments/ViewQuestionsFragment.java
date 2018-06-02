@@ -1,8 +1,10 @@
 package example.sanjeev.com.quizapptrial.ui.fragments;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -65,6 +67,7 @@ public class ViewQuestionsFragment extends Fragment {
 
 
         StringRequest mStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onResponse(String response) {
 
@@ -86,13 +89,24 @@ public class ViewQuestionsFragment extends Fragment {
                     JSONArray startTimeArray = (JSONArray) jsonArray.get(2);
                     JSONArray endTimeArray = (JSONArray) jsonArray.get(3);
 
-                   for(int i=0;i<optionJsonArray.length();i++){
-                        String messageStr  = (String) questionArray.get(i);
-                        Message message = new Message();
-                        message.setMessage(messageStr);
-                        messageList.add(message);
-                       Log.e("questionAQuestionrray",i + " " +  String.valueOf(optionJsonArray.get(i)));
+                   for(int i=0;i<questionArray.length();i++){
+                        String question  = (String) questionArray.get(i);
+                       String optionJsonStr = (String) optionJsonArray.get(i);
+                       JSONArray optionJsonStrList = new JSONArray(optionJsonStr);
+
+
+                       Log.e("QuestionArray",i + " " +  question);
+                       Log.e("optionJsonArray",i + " " +  optionJsonStrList.length());
+
+                       Log.e("optionJsonStrList",i + " " +  optionJsonStrList.length());
+
+                      for(int d=0;d<optionJsonStrList.length();d++) {
+                           JSONObject option = (JSONObject) optionJsonStrList.get(d);
+                           Log.e("OptionArray", " " + option.get("optionname") + " " + option.get("priority")+ " " + option.get("iscorrect"));
+                       }
                     }
+
+
  /*
                     RecyclerView recyclerView = getActivity().findViewById(R.id.message_list_rv);
                     RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
