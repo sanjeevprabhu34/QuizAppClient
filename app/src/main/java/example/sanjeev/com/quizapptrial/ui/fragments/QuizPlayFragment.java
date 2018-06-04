@@ -1,5 +1,9 @@
 package example.sanjeev.com.quizapptrial.ui.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -33,10 +38,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import example.sanjeev.com.quizapptrial.R;
+import example.sanjeev.com.quizapptrial.Services.TimerService;
 import example.sanjeev.com.quizapptrial.model.Message;
+import example.sanjeev.com.quizapptrial.ui.activities.MainActivity;
 import example.sanjeev.com.quizapptrial.ui.adapters.RecyclerAdapter;
 
-public class ViewQuestionsFragment extends Fragment {
+public class QuizPlayFragment extends Fragment{
+    private interactor myInteractor;
+
 
     @Nullable
     @Override
@@ -45,6 +54,11 @@ public class ViewQuestionsFragment extends Fragment {
         return v;
     }
 
+    public interface interactor  {
+        public void createNewQuizTimerReceiver();
+    }
+
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -52,10 +66,15 @@ public class ViewQuestionsFragment extends Fragment {
     }
 
     private void init(){
+        myInteractor = (interactor) getActivity();
         final EditText messageEt = getActivity().findViewById(R.id.message_et);
         Button submitButton  = getActivity().findViewById(R.id.add_question);
 
         getPost();
+    }
+
+    public void timerComplete(){
+       Toast.makeText(getActivity(), "Timer Up", Toast.LENGTH_LONG).show();
     }
 
     private void getPost(){
@@ -80,45 +99,8 @@ public class ViewQuestionsFragment extends Fragment {
                     String messagesList = (String) jsonObject.get("content");
                     JSONArray jsonArray = new JSONArray(messagesList);
 
-                    JSONArray questionArray = (JSONArray) jsonArray.get(0);
-                    ArrayList<Message> messageList = new ArrayList<>();
 
-                    Log.e("questionArray", String.valueOf(questionArray.length()));
-
-                    JSONArray optionJsonArray = (JSONArray) jsonArray.get(1);
-                    JSONArray startTimeArray = (JSONArray) jsonArray.get(2);
-                    JSONArray endTimeArray = (JSONArray) jsonArray.get(3);
-
-                   for(int i=0;i<questionArray.length();i++){
-                        String question  = (String) questionArray.get(i);
-                       String optionJsonStr = (String) optionJsonArray.get(i);
-                       JSONArray optionJsonStrList = new JSONArray(optionJsonStr);
-
-
-                       Log.e("QuestionArray",i + " " +  question);
-                       Log.e("optionJsonArray",i + " " +  optionJsonStrList.length());
-
-                       Log.e("optionJsonStrList",i + " " +  optionJsonStrList.length());
-
-                      for(int d=0;d<optionJsonStrList.length();d++) {
-                           JSONObject option = (JSONObject) optionJsonStrList.get(d);
-                           Log.e("OptionArray", " " + option.get("optionname") + " " + option.get("priority")+ " " + option.get("iscorrect"));
-                       }
-                    }
-
-
- /*
-                    RecyclerView recyclerView = getActivity().findViewById(R.id.message_list_rv);
-                    RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-                    recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-                    recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
-
-                    RecyclerAdapter recyclerAdapter = new RecyclerAdapter(messageList);
-
-                    recyclerView.setAdapter(recyclerAdapter);
-                    recyclerView.setLayoutManager(linearLayoutManager);
-                    recyclerAdapter.notifyDataSetChanged();*/
+                    gotQuizData(jsonArray);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -145,5 +127,62 @@ public class ViewQuestionsFragment extends Fragment {
         };
 
         mRequestQueue.add(mStringRequest);
+    }
+
+    private void gotQuizData(JSONArray jsonArray){
+        JSONArray questionArray = null;
+        try {
+            questionArray = (JSONArray) jsonArray.get(0);
+            ArrayList<Message> messageList = new ArrayList<>();
+
+            Log.e("questionArray", String.valueOf(questionArray.length()));
+
+            JSONArray optionJsonArray = (JSONArray) jsonArray.get(1);
+            JSONArray startTimeArray = (JSONArray) jsonArray.get(2);
+            JSONArray endTimeArray = (JSONArray) jsonArray.get(3);
+
+            for(int i=0;i<questionArray.length();i++){
+                String question  = (String) questionArray.get(i);
+                String optionJsonStr = (String) optionJsonArray.get(i);
+                JSONArray optionJsonStrList = new JSONArray(optionJsonStr);
+
+
+                Log.e("QuestionArray",i + " " +  question);
+                Log.e("optionJsonArray",i + " " +  optionJsonStrList.length());
+
+                Log.e("optionJsonStrList",i + " " +  optionJsonStrList.length());
+
+                for(int d=0;d<optionJsonStrList.length();d++) {
+                    JSONObject option = (JSONObject) optionJsonStrList.get(d);
+                    Log.e("OptionArray", " " + option.get("optionname") + " " + option.get("priority")+ " " + option.get("iscorrect"));
+                }
+            }
+
+
+ /*
+                    RecyclerView recyclerView = getActivity().findViewById(R.id.message_list_rv);
+                    RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+                    recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+                    recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+
+                    RecyclerAdapter recyclerAdapter = new RecyclerAdapter(messageList);
+
+                    recyclerView.setAdapter(recyclerAdapter);
+                    recyclerView.setLayoutManager(linearLayoutManager);
+                    recyclerAdapter.notifyDataSetChanged();*/
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        startTimerService();
+
+    }
+
+    private void startTimerService(){
+        Intent timerIntent = new Intent(getActivity(), TimerService.class);
+        getActivity().startService(timerIntent);
+        myInteractor.createNewQuizTimerReceiver();
     }
 }

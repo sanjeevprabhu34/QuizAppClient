@@ -1,10 +1,15 @@
 package example.sanjeev.com.quizapptrial.ui.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,16 +20,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import example.sanjeev.com.quizapptrial.AppConstants.CustomIntents;
 import example.sanjeev.com.quizapptrial.R;
 import example.sanjeev.com.quizapptrial.ui.fragments.AddMessageFragment;
 import example.sanjeev.com.quizapptrial.ui.fragments.AddPostSectionFragment;
 import example.sanjeev.com.quizapptrial.ui.fragments.LoginFragment;
 import example.sanjeev.com.quizapptrial.ui.fragments.RegisterFragment;
 import example.sanjeev.com.quizapptrial.ui.fragments.ViewMessageFragment;
-import example.sanjeev.com.quizapptrial.ui.fragments.ViewQuestionsFragment;
+import example.sanjeev.com.quizapptrial.ui.fragments.QuizPlayFragment;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, QuizPlayFragment.interactor {
+    private BroadcastReceiver broadcastReceiver;
+    private QuizPlayFragment quizPlayFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +68,8 @@ public class MainActivity extends AppCompatActivity
 
 
     }
+
+
 
 
     @Override
@@ -101,10 +111,10 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.add_post) {
-            ViewQuestionsFragment addFragment = new ViewQuestionsFragment();
+            quizPlayFragment = new QuizPlayFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.fragment_place_holder, addFragment).addToBackStack(null).commit();
+            transaction.replace(R.id.fragment_place_holder, quizPlayFragment).addToBackStack(null).commit();
         } else if (id == R.id.view_post) {
             ViewMessageFragment addFragment = new ViewMessageFragment();
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -133,5 +143,23 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void createNewQuizTimerReceiver(){
+        try {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(CustomIntents.QUIZ_TIMER);
+            broadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    Log.e("received", "Timer has stopped");
+                    quizPlayFragment.timerComplete();
+                }
+            };
+            registerReceiver(broadcastReceiver, intentFilter);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }
