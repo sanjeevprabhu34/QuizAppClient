@@ -12,7 +12,7 @@ import android.util.Log;
 import example.sanjeev.com.quizapptrial.AppConstants.CustomIntents;
 
 public class TimerService extends Service {
-    private int timeAllowedInSecs = 60;
+    private int timeAllowedInSecs = 20;
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -34,7 +34,11 @@ public class TimerService extends Service {
                             @Override
                             public void onTick(long millisUntilFinished) {
                                 int secs = (int) (millisUntilFinished/1000);
-                                Log.e("TimeCompleted", " time is "+ secs);
+                                Intent intent = new Intent();
+                                intent.setAction(CustomIntents.QUIZ_TIMER_INTERVAL);
+                                intent.putExtra("timeremaining",String.valueOf(secs) );
+                                sendBroadcast(intent);
+                                Log.e("TimerInterval", " time is "+ secs);
                             }
 
                             @Override

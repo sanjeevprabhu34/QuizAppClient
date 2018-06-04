@@ -31,7 +31,8 @@ import example.sanjeev.com.quizapptrial.ui.fragments.QuizPlayFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, QuizPlayFragment.interactor {
-    private BroadcastReceiver broadcastReceiver;
+    private BroadcastReceiver timerCompleteReceiver;
+    private BroadcastReceiver intervaCompleteReceiver;
     private QuizPlayFragment quizPlayFragment;
 
     @Override
@@ -149,14 +150,34 @@ public class MainActivity extends AppCompatActivity
         try {
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(CustomIntents.QUIZ_TIMER);
-            broadcastReceiver = new BroadcastReceiver() {
+            timerCompleteReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     Log.e("received", "Timer has stopped");
                     quizPlayFragment.timerComplete();
+                    unregisterReceiver(timerCompleteReceiver);
+
                 }
             };
-            registerReceiver(broadcastReceiver, intentFilter);
+            registerReceiver(timerCompleteReceiver, intentFilter);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        try {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(CustomIntents.QUIZ_TIMER_INTERVAL);
+            intervaCompleteReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    Log.e("received", "Timer interval");
+                    String timeRemaining = intent.getStringExtra("timeremaining");
+                    quizPlayFragment.timerInterval(timeRemaining);
+
+                }
+            };
+            registerReceiver(intervaCompleteReceiver, intentFilter);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
